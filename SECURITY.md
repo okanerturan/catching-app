@@ -7,7 +7,7 @@ deployment and historical commits are not maintained services.
 
 ## Reporting a vulnerability
 
-Please use [GitHub's private vulnerability reporting form](https://github.com/okturan/catching-app/security/advisories/new)
+Please use [GitHub's private vulnerability reporting form](https://github.com/okanerturan/catching-app/security/advisories/new)
 instead of opening a public issue. Include the affected route or workflow, the
 role of each test user, clear reproduction steps, and the impact you observed.
 
