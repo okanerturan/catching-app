@@ -4,7 +4,7 @@
 # the Dockerfile). The deploy workflow runs bin/kamal deploy after CI passes
 # on master.
 service: catching-app
-image: okturan/catching-app
+image: okanerturan/catching-app
 
 # The box is shared, so every container has a ceiling. Kamal puts web on the
 # shared kamal network for kamal-proxy; it also joins catching-app-private,
@@ -35,7 +35,7 @@ proxy:
 # packages (see the README).
 registry:
   server: ghcr.io
-  username: okturan
+  username: okanerturan
   password:
     - KAMAL_REGISTRY_PASSWORD
 
