@@ -121,7 +121,7 @@ See the official [Ruby releases](https://www.ruby-lang.org/en/downloads/releases
 
 ## History
 
-The original 2021 application was a three-person Le Wagon project built with [Sedef Çakmak](https://github.com/sedcakmak) and [Ege Çakmak](https://github.com/Egecak). GitHub attributes substantial implementation work to Okan, including 11 merged pull requests and 47 of the newest 100 commits at the 2026-07-18 audit. [Okan's merged pull-request history](https://github.com/okanerturan/catching-app/pulls?q=is%3Apr+is%3Amerged+author%3Aokturan) is the durable attribution source; the project is not presented as solo work, and no project-wide license is asserted without all three authors' agreement.
+The original 2021 application was a three-person Le Wagon project built with [Sedef Çakmak](https://github.com/sedcakmak) and [Ege Çakmak](https://github.com/Egecak). GitHub attributes substantial implementation work to Okan, including 11 merged pull requests and 47 of the newest 100 commits at the 2026-07-18 audit. [Okan's merged pull-request history](https://github.com/okanerturan/catching-app/pulls?q=is%3Apr+is%3Amerged+author%3Aokanerturan) is the durable attribution source; the project is not presented as solo work, and no project-wide license is asserted without all three authors' agreement.
 
 ### The 2021 interface
 
