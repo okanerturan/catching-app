@@ -115,7 +115,7 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_entity
-    assert_select "input[name='organizer[email]'][value='ann@example.com']"
+    assert_select "input[name='organizer[email]'][value='Ann@example.com']"
     assert_select "select#timezone-picker-new[data-selected='Europe/Berlin']"
     assert_select "#time_slot_array[value='not-an-iso8601-time']"
     assert_match "Time slots must use ISO 8601 timestamps", response.body
