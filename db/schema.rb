@@ -15,25 +15,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_000001) do
   enable_extension "pg_catalog.plpgsql"
 
   create_table "events", force: :cascade do |t|
-    t.datetime "cancelled_at"
     t.datetime "created_at", null: false
     t.text "description", default: "", null: false
-    t.integer "duration_minutes"
     t.datetime "end_time", precision: nil
     t.string "name", null: false
+    t.datetime "start_time", precision: nil
+    t.datetime "updated_at", null: false
+    t.integer "slot_minutes", default: 30, null: false
+    t.string "time_zone", default: "UTC", null: false
+    t.string "place"
+    t.string "place_url"
+    t.integer "duration_minutes"
+    t.integer "revision", default: 0, null: false
     t.integer "notified_revision", default: 0, null: false
     t.datetime "offer_revised_at"
     t.integer "offer_revision_added", default: 0, null: false
     t.integer "offer_revision_removed", default: 0, null: false
-    t.string "place"
-    t.string "place_url"
-    t.integer "reopen_count", default: 0, null: false
+    t.datetime "cancelled_at"
     t.datetime "reopened_at"
-    t.integer "revision", default: 0, null: false
-    t.integer "slot_minutes", default: 30, null: false
-    t.datetime "start_time", precision: nil
-    t.string "time_zone", default: "UTC", null: false
-    t.datetime "updated_at", null: false
+    t.integer "reopen_count", default: 0, null: false
     t.check_constraint "(start_time IS NULL) = (end_time IS NULL)", name: "events_window_complete"
     t.check_constraint "duration_minutes IS NULL OR duration_minutes > 0 AND (duration_minutes % 15) = 0", name: "events_duration_minutes_whole_quarters"
     t.check_constraint "notified_revision >= 0 AND notified_revision <= revision", name: "events_revisions_ordered"
@@ -45,17 +45,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_000001) do
   end
 
   create_table "mail_deliveries", force: :cascade do |t|
-    t.string "canonical_recipient_email", null: false
-    t.datetime "created_at", null: false
-    t.datetime "delivered_at"
-    t.string "error"
     t.bigint "event_id", null: false
-    t.datetime "failed_at"
-    t.string "kind", null: false
     t.bigint "participant_id"
+    t.string "kind", null: false
     t.string "recipient_email", null: false
-    t.string "request_ip"
+    t.string "canonical_recipient_email", null: false
     t.string "sender_email"
+    t.string "request_ip"
+    t.datetime "delivered_at"
+    t.datetime "failed_at"
+    t.string "error"
+    t.datetime "created_at", null: false
     t.index ["canonical_recipient_email", "created_at"], name: "index_mail_deliveries_on_recipient_and_created_at"
     t.index ["event_id", "canonical_recipient_email"], name: "index_mail_deliveries_on_event_and_recipient"
     t.index ["participant_id", "created_at"], name: "index_mail_deliveries_on_participant_id_and_created_at"
@@ -65,22 +65,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_000001) do
   end
 
   create_table "participants", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "declined_at"
-    t.string "email", null: false
     t.bigint "event_id", null: false
-    t.datetime "left_at"
-    t.datetime "link_opened_at"
+    t.bigint "user_id"
+    t.string "role", null: false
+    t.string "email", null: false
     t.string "name"
+    t.string "token_digest"
     t.string "pending_token_digest"
     t.datetime "pending_token_expires_at"
-    t.datetime "reply_voided_at"
+    t.datetime "link_opened_at"
     t.datetime "responded_at"
-    t.string "role", null: false
+    t.datetime "declined_at"
+    t.datetime "left_at"
     t.string "time_zone"
-    t.string "token_digest"
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id"
+    t.datetime "reply_voided_at"
     t.index ["event_id", "email"], name: "index_participants_on_event_id_and_email", unique: true
     t.index ["event_id"], name: "index_participants_one_organizer_per_event", unique: true, where: "((role)::text = 'organizer'::text)"
     t.index ["id", "event_id"], name: "index_participants_on_id_and_event_id", unique: true
@@ -104,88 +104,88 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_000001) do
     t.integer "duration_minutes"
     t.bigint "event_id", null: false
     t.string "name", null: false
-    t.integer "position", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.integer "position", default: 0, null: false
     t.index ["event_id", "position"], name: "index_plan_items_on_event_id_and_position"
     t.check_constraint "\"position\" >= 0", name: "plan_items_position_non_negative"
     t.check_constraint "duration_minutes IS NULL OR duration_minutes > 0", name: "plan_items_duration_positive"
   end
 
   create_table "sessions", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "ip_address"
-    t.datetime "updated_at", null: false
-    t.string "user_agent"
     t.bigint "user_id", null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
   create_table "solid_queue_batch_executions", force: :cascade do |t|
+    t.bigint "job_id", null: false
     t.bigint "batch_id", null: false
     t.datetime "created_at", null: false
-    t.bigint "job_id", null: false
     t.index ["batch_id"], name: "index_solid_queue_batch_executions_on_batch_id"
     t.index ["job_id"], name: "index_solid_queue_batch_executions_on_job_id", unique: true
   end
 
   create_table "solid_queue_batches", force: :cascade do |t|
     t.string "active_job_batch_id"
-    t.integer "completed_jobs", default: 0, null: false
-    t.datetime "created_at", null: false
     t.string "description"
-    t.datetime "enqueued_at"
-    t.datetime "failed_at"
-    t.integer "failed_jobs", default: 0, null: false
-    t.datetime "finished_at"
-    t.text "metadata"
-    t.text "on_failure"
     t.text "on_finish"
     t.text "on_success"
+    t.text "on_failure"
+    t.text "metadata"
     t.integer "total_jobs", default: 0, null: false
+    t.integer "completed_jobs", default: 0, null: false
+    t.integer "failed_jobs", default: 0, null: false
+    t.datetime "enqueued_at"
+    t.datetime "finished_at"
+    t.datetime "failed_at"
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["active_job_batch_id"], name: "index_solid_queue_batches_on_active_job_batch_id", unique: true
     t.index ["finished_at"], name: "index_solid_queue_batches_on_finished_at"
   end
 
   create_table "solid_queue_blocked_executions", force: :cascade do |t|
-    t.string "concurrency_key", null: false
-    t.datetime "created_at", null: false
-    t.datetime "expires_at", null: false
     t.bigint "job_id", null: false
-    t.integer "priority", default: 0, null: false
     t.string "queue_name", null: false
+    t.integer "priority", default: 0, null: false
+    t.string "concurrency_key", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
     t.index ["concurrency_key", "priority", "job_id"], name: "index_solid_queue_blocked_executions_for_release"
     t.index ["expires_at", "concurrency_key"], name: "index_solid_queue_blocked_executions_for_maintenance"
     t.index ["job_id"], name: "index_solid_queue_blocked_executions_on_job_id", unique: true
   end
 
   create_table "solid_queue_claimed_executions", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.bigint "job_id", null: false
     t.bigint "process_id"
+    t.datetime "created_at", null: false
     t.index ["job_id"], name: "index_solid_queue_claimed_executions_on_job_id", unique: true
     t.index ["process_id", "job_id"], name: "index_solid_queue_claimed_executions_on_process_id_and_job_id"
   end
 
   create_table "solid_queue_failed_executions", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.text "error"
     t.bigint "job_id", null: false
+    t.text "error"
+    t.datetime "created_at", null: false
     t.index ["job_id"], name: "index_solid_queue_failed_executions_on_job_id", unique: true
   end
 
   create_table "solid_queue_jobs", force: :cascade do |t|
-    t.string "active_job_id"
-    t.text "arguments"
-    t.bigint "batch_id"
+    t.string "queue_name", null: false
     t.string "class_name", null: false
+    t.text "arguments"
+    t.integer "priority", default: 0, null: false
+    t.string "active_job_id"
+    t.datetime "scheduled_at"
+    t.datetime "finished_at"
     t.string "concurrency_key"
     t.datetime "created_at", null: false
-    t.datetime "finished_at"
-    t.integer "priority", default: 0, null: false
-    t.string "queue_name", null: false
-    t.datetime "scheduled_at"
     t.datetime "updated_at", null: false
+    t.bigint "batch_id"
     t.index ["active_job_id"], name: "index_solid_queue_jobs_on_active_job_id"
     t.index ["batch_id"], name: "index_solid_queue_jobs_on_batch_id"
     t.index ["class_name"], name: "index_solid_queue_jobs_on_class_name"
@@ -195,76 +195,76 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_000001) do
   end
 
   create_table "solid_queue_pauses", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.string "queue_name", null: false
+    t.datetime "created_at", null: false
     t.index ["queue_name"], name: "index_solid_queue_pauses_on_queue_name", unique: true
   end
 
   create_table "solid_queue_processes", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "hostname"
     t.string "kind", null: false
     t.datetime "last_heartbeat_at", null: false
-    t.text "metadata"
-    t.string "name", null: false
-    t.integer "pid", null: false
     t.bigint "supervisor_id"
+    t.integer "pid", null: false
+    t.string "hostname"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.string "name", null: false
     t.index ["last_heartbeat_at"], name: "index_solid_queue_processes_on_last_heartbeat_at"
     t.index ["name", "supervisor_id"], name: "index_solid_queue_processes_on_name_and_supervisor_id", unique: true
     t.index ["supervisor_id"], name: "index_solid_queue_processes_on_supervisor_id"
   end
 
   create_table "solid_queue_ready_executions", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.bigint "job_id", null: false
-    t.integer "priority", default: 0, null: false
     t.string "queue_name", null: false
+    t.integer "priority", default: 0, null: false
+    t.datetime "created_at", null: false
     t.index ["job_id"], name: "index_solid_queue_ready_executions_on_job_id", unique: true
     t.index ["priority", "job_id"], name: "index_solid_queue_poll_all"
     t.index ["queue_name", "priority", "job_id"], name: "index_solid_queue_poll_by_queue"
   end
 
   create_table "solid_queue_recurring_executions", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.bigint "job_id", null: false
-    t.datetime "run_at", null: false
     t.string "task_key", null: false
+    t.datetime "run_at", null: false
+    t.datetime "created_at", null: false
     t.index ["job_id"], name: "index_solid_queue_recurring_executions_on_job_id", unique: true
     t.index ["task_key", "run_at"], name: "index_solid_queue_recurring_executions_on_task_key_and_run_at", unique: true
   end
 
   create_table "solid_queue_recurring_tasks", force: :cascade do |t|
-    t.text "arguments"
-    t.string "class_name"
-    t.string "command", limit: 2048
-    t.datetime "created_at", null: false
-    t.text "description"
     t.string "key", null: false
-    t.integer "priority", default: 0
-    t.string "queue_name"
     t.string "schedule", null: false
+    t.string "command", limit: 2048
+    t.string "class_name"
+    t.text "arguments"
+    t.string "queue_name"
+    t.integer "priority", default: 0
     t.boolean "static", default: true, null: false
+    t.text "description"
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_solid_queue_recurring_tasks_on_key", unique: true
     t.index ["static"], name: "index_solid_queue_recurring_tasks_on_static"
   end
 
   create_table "solid_queue_scheduled_executions", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.bigint "job_id", null: false
-    t.integer "priority", default: 0, null: false
     t.string "queue_name", null: false
+    t.integer "priority", default: 0, null: false
     t.datetime "scheduled_at", null: false
+    t.datetime "created_at", null: false
     t.index ["job_id"], name: "index_solid_queue_scheduled_executions_on_job_id", unique: true
     t.index ["scheduled_at", "priority", "job_id"], name: "index_solid_queue_dispatch_all"
   end
 
   create_table "solid_queue_semaphores", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "expires_at", null: false
     t.string "key", null: false
-    t.datetime "updated_at", null: false
     t.integer "value", default: 1, null: false
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["expires_at"], name: "index_solid_queue_semaphores_on_expires_at"
     t.index ["key", "value"], name: "index_solid_queue_semaphores_on_key_and_value"
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
@@ -273,9 +273,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_000001) do
   create_table "time_slots", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "event_id", null: false
-    t.bigint "participant_id", null: false
     t.datetime "start_time", precision: nil, null: false
     t.datetime "updated_at", null: false
+    t.bigint "participant_id", null: false
     t.index ["event_id", "start_time"], name: "index_time_slots_on_event_id_and_start_time"
     t.index ["participant_id", "start_time"], name: "index_time_slots_on_participant_id_and_start_time", unique: true
     t.check_constraint "start_time = date_bin('PT15M'::interval, start_time, '2000-01-01 00:00:00'::timestamp without time zone)", name: "time_slots_start_time_quarter_hour"
@@ -284,12 +284,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_000001) do
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
-    t.datetime "email_confirmed_at"
+    t.string "password_digest", null: false
     t.string "first_name", null: false
     t.string "last_name", null: false
-    t.datetime "login_link_used_at"
-    t.string "password_digest", null: false
     t.datetime "updated_at", null: false
+    t.datetime "email_confirmed_at"
+    t.datetime "login_link_used_at"
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
